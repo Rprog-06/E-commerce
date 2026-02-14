@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 
 function Cart() {
   const [cart, setCart] = useState([]);
+  const [products, setProducts] = useState([]);
+ 
 
   // load cart
   useEffect(() => {
@@ -11,23 +13,37 @@ function Cart() {
 
   // update quantity
   const updateQuantity = (productId, delta) => {
-    const updatedCart = cart.map((item) => {
-      if (item.productId === productId) {
-        return {
-          ...item,
-          quantity: Math.max(1, item.quantity + delta),
-        };
+  const updatedCart = cart.map((item) => {
+    if (item.productId === productId) {
+
+      const newQuantity = item.quantity + delta;
+
+      // Prevent below 1
+      if (newQuantity < 1) return item;
+
+      // Prevent exceeding available stock
+      if (newQuantity > item.availableStock) {
+        alert("Cannot exceed available stock!");
+        return item;
       }
-      return item;
-    });
 
-    setCart(updatedCart);
-    localStorage.setItem("cart", JSON.stringify(updatedCart));
-  };
+      return {
+        ...item,
+        quantity: newQuantity
+      };
+    }
+    return item;
+  });
+
+  setCart(updatedCart);
+  localStorage.setItem("cart", JSON.stringify(updatedCart));
+};
+
+   
   const placeOrder = async () => {
-  const user = JSON.parse(localStorage.getItem("user"));
+  const token = (localStorage.getItem("token"));
 
-  if (!user) {
+  if (!token) {
     alert("Please login first");
     return;
   }
@@ -37,10 +53,15 @@ function Cart() {
   }
 
   const orderPayload = {
-    userId: user.id||user.userId,
+    
     items: cart.map(item => ({
       productId: item.productId,
       quantity: item.quantity
+    
+
+      
+
+
     }))
   };
   console.log("Sending",orderPayload)
@@ -49,8 +70,11 @@ function Cart() {
     const response = await fetch("http://localhost:8080/orders", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+        
       },
+   
       body: JSON.stringify(orderPayload)
     });
 
@@ -112,6 +136,7 @@ function Cart() {
           <h4>{item.name}</h4>
           <p>Price: ₹ {item.price}</p>
           <p>Quantity: {item.quantity}</p>
+     
 
           <button onClick={() => updateQuantity(item.productId, -1)}>
             -

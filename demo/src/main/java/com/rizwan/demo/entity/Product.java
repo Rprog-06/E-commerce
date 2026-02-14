@@ -22,7 +22,23 @@ public class Product {
     private String name;
 
     private double price;
-
+    private boolean deleted=false;
+    private Integer quantity;
+    
+     
+     
+    public boolean getDeleted() {
+        return deleted;
+    }
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
+    public Integer getQuantity() {
+        return quantity;
+    }
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
+    }
     // getters & setters
     public Long getId() {
         return id;

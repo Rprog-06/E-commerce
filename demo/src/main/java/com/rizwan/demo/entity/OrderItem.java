@@ -9,6 +9,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.FetchType;
 
+
 @Entity
 @Table(name = "order_items")
 public class OrderItem {
@@ -28,6 +29,7 @@ public class OrderItem {
 
     // Many items → one product
     @ManyToOne(fetch = FetchType.LAZY)
+
     @JoinColumn(name = "product_id")
     private Product product;
 

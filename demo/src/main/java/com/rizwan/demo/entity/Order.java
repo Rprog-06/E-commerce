@@ -30,12 +30,14 @@ public class Order {
     private Long id;
 
     private LocalDateTime orderDate;
+    private double totalPrice;
 
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
 
     // Many orders → one user
     @ManyToOne(fetch = FetchType.LAZY)
+   
     @JoinColumn(name = "user_id",nullable = false)
     private Users user;
 
@@ -44,6 +46,13 @@ public class Order {
     private List<OrderItem> orderItems = new ArrayList<>();
 
     // getters & setters
+    public double getTotalPrice() {
+        return totalPrice;
+    }
+
+    public void setTotalPrice(double totalPrice) {
+        this.totalPrice = totalPrice;
+    }
     public Long getId() {
         return id;
     }
@@ -74,5 +83,6 @@ public class Order {
     public void setOrderItems(List<OrderItem> orderItems) {
         this.orderItems = orderItems;
     }
+    
 
 }

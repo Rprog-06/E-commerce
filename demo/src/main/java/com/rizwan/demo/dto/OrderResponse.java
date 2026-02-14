@@ -12,6 +12,9 @@ public class OrderResponse {
     private Long userId;
     private String userName;
     private List<OrderItemResponse> items;
+    private double totalPrice;
+public double getTotalPrice() { return totalPrice; }
+ public void setTotalPrice(double totalPrice) { this.totalPrice = totalPrice; }
 
     public Long getOrderId() {
         return orderId;

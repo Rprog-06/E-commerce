@@ -39,10 +39,10 @@ public class OrderService {
     }
 
     @Transactional
-    public Long placeOrder(PlaceOrderRequest request) {
+    public Long placeOrder(Long userId,PlaceOrderRequest request) {
 
         // 1️⃣ Fetch User
-        Users user = userRepository.findById(request.getUserId())
+        Users user = userRepository.findById(userId)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("User not found"));
 
@@ -51,6 +51,7 @@ public class OrderService {
         order.setUser(user);
         order.setStatus(OrderStatus.CREATED);
         order.setOrderDate(LocalDateTime.now());
+        double totalPrice = 0.0;
 
         // 3️⃣ Create Order Items
         for (var itemRequest : request.getItems()) {
@@ -58,15 +59,26 @@ public class OrderService {
             Product product = productRepository.findById(itemRequest.getProductId())
                     .orElseThrow(() ->
                             new ResourceNotFoundException("Product not found"));
+            if(product.getDeleted()) {
+                throw new ResourceNotFoundException("Product not found");
+            }
+            if(product.getQuantity()<itemRequest.getQuantity()) {
+                throw new ResourceNotFoundException("Not enough quantity for product: "+product.getName());
+            }
+            product.setQuantity(product.getQuantity()-itemRequest.getQuantity());
+
 
             OrderItem orderItem = new OrderItem();
             orderItem.setOrder(order);
+            totalPrice += product.getPrice()*itemRequest.getQuantity();
             orderItem.setProduct(product);
             orderItem.setQuantity(itemRequest.getQuantity());
             orderItem.setPrice(product.getPrice());
 
             order.getOrderItems().add(orderItem);
         }
+        order.setTotalPrice(totalPrice);
+        
 
         // 4️⃣ Save Order (OrderItems saved automatically because of CASCADE)
         Order savedOrder = orderRepository.save(order);
@@ -84,6 +96,7 @@ public class OrderService {
         response.setOrderDate(order.getOrderDate());
         response.setUserId(order.getUser().getId());
         response.setUserName(order.getUser().getName());
+        response.setTotalPrice(order.getTotalPrice());
        List<OrderItemResponse> itemResponses = new ArrayList<>();
         for (OrderItem item : order.getOrderItems()) {
             OrderItemResponse itemResponse = new OrderItemResponse();
@@ -91,6 +104,7 @@ public class OrderService {
             itemResponse.setProductName(item.getProduct().getName());
             itemResponse.setQuantity(item.getQuantity());
             itemResponse.setPrice(item.getPrice());
+
             itemResponses.add(itemResponse);
         }
         response.setItems(itemResponses);
@@ -143,6 +157,36 @@ public List<OrderResponse> getOrdersByUser(Long userId) {
 
     return responses;
 }
+    @Transactional(readOnly = true)
+    public List<OrderResponse> getOrdersByEmail(String email) {
+        List<Order> orders = orderRepository.findByUserEmail(email);
+
+        List<OrderResponse> responses = new ArrayList<>();
+
+        for (Order order : orders) {
+            OrderResponse response = new OrderResponse();
+            response.setOrderId(order.getId());
+            response.setStatus(order.getStatus().name());
+            response.setOrderDate(order.getOrderDate());
+            response.setUserId(order.getUser().getId());
+            response.setUserName(order.getUser().getName());
+
+            List<OrderItemResponse> items = new ArrayList<>();
+            for (OrderItem item : order.getOrderItems()) {
+                OrderItemResponse ir = new OrderItemResponse();
+                ir.setProductId(item.getProduct().getId());
+                ir.setProductName(item.getProduct().getName());
+                ir.setQuantity(item.getQuantity());
+                ir.setPrice(item.getPrice());
+                items.add(ir);
+            }
+
+            response.setItems(items);
+            responses.add(response);
+        }
+
+        return responses;
+    }
 
 }
 

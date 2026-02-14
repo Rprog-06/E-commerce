@@ -5,6 +5,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Products from "./components/Products";
 import Cart from "./components/Cart";
 import Navbar from "./components/Navbar"
+import AdminDashboard from "./components/AdminDashboard";
 
 function App() {
   return (
@@ -25,6 +26,11 @@ function App() {
         />
 
        
+        <Route path="/admin" element={
+          <ProtectedRoute role="ADMIN">
+            <AdminDashboard />
+          </ProtectedRoute>
+        } />
         <Route path="/products" element={
           <ProtectedRoute>
           <Products />

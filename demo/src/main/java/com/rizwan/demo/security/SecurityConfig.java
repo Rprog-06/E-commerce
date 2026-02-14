@@ -4,10 +4,28 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.*;
-import java.util.List;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import java.util.List;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity; 
+import org.springframework.security.core.authority.SimpleGrantedAuthority; 
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UserDetails; 
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+//help to import authorities
+
+
+
+
+@EnableMethodSecurity 
 @Configuration
 public class SecurityConfig {
+    @Autowired
+    private JwtFilter jwtFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -18,8 +36,9 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/users/login", "/users/register","/products").permitAll()
                 .anyRequest().authenticated()
-            );
-
+            )
+            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+            
         return http.build();
     }
 

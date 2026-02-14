@@ -11,13 +11,19 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import com.rizwan.demo.dto.OrderResponse;
+import org.springframework.security.core.Authentication;    
 
 import com.rizwan.demo.entity.Order;
 import java.util.List;
-
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import com.rizwan.demo.entity.Users;
+ import com.rizwan.demo.exception.ResourceNotFoundException; 
+ import com.rizwan.demo.repository.UserRepository;
+import org.springframework.security.core.userdetails.UserDetails;
 import com.rizwan.demo.dto.PlaceOrderRequest;
 import com.rizwan.demo.enums.OrderStatus;
 import com.rizwan.demo.service.OrderService;
+
 
 import jakarta.validation.Valid;
 
@@ -26,27 +32,38 @@ import jakarta.validation.Valid;
 public class OrderController {
 
     private final OrderService orderService;
+    private final UserRepository userRepository;
 
-    public OrderController(OrderService orderService) {
-        if(orderService == null) {
-            throw new IllegalArgumentException("OrderService cannot be null");
-        }
+    public OrderController(OrderService orderService,UserRepository userRepository) {
+        // if(orderService == null) {
+        //     throw new IllegalArgumentException("OrderService cannot be null");
+        // }
         this.orderService = orderService;
+        this.userRepository = userRepository;
        
         // System.out.println("OrderController initialized with OrderService:");
     }
 
     @PostMapping
-    public ResponseEntity<String> placeOrder(
+    public ResponseEntity<String> placeOrder( Authentication authentication,
             @Valid @RequestBody PlaceOrderRequest request
     ) {
-        Long orderId = orderService.placeOrder(request);
+        String email = authentication.getName();
+        Users user = userRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User not found"));    
+
+    
+        Long orderId =orderService.placeOrder(user.getId(),request);
+
+       
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body("Order placed successfully with id: " + orderId);
     }
     @GetMapping("/{id}")
     public ResponseEntity<OrderResponse> getOrder(@PathVariable Long id) {
+        
         return ResponseEntity.ok(orderService.getOrderById(id));
     }
 
@@ -63,9 +80,13 @@ public class OrderController {
 
         return ResponseEntity.ok(orderResponse);
     }
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<OrderResponse>> getOrdersByUserId(@PathVariable Long userId) {
-        List<OrderResponse> orders = orderService.getOrdersByUser(userId);
-        return ResponseEntity.ok(orders);
-    }
+    @GetMapping("/my")
+public ResponseEntity<List<OrderResponse>> getMyOrders(Authentication authentication) {
+
+    String email = authentication.getName();
+
+    List<OrderResponse> orders = orderService.getOrdersByEmail(email);
+
+    return ResponseEntity.ok(orders);
+}
 }

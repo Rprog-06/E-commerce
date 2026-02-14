@@ -1,14 +1,26 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import {jwtDecode} from "jwt-decode";
 
 function Orders() {
   const [orders, setOrders] = useState([]);
+  const token = localStorage.getItem("token");
+  let id = null;
+  if (token) {
+    const decoded = jwtDecode(token);
+    id = decoded.userId || decoded.id; // Adjust based on your token structure
+  }
+  
  
   
   useEffect(() => {
-     const user= JSON.parse(localStorage.getItem("user"));
+     const token= (localStorage.getItem("token"));
     axios
-      .get(`http://localhost:8080/orders/user/${user.userId || user.id}`)
+      .get(`http://localhost:8080/orders/my`,{
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
       .then((res) => setOrders(res.data))
       .catch((err) => console.error(err));
   }, []);
