@@ -22,7 +22,7 @@ const Navbar = () => {
         role==="ROLE_ADMIN"&&(
           <Link to="/admin">Admin</Link>
         )
-      }
+      }|{" "}
       <Link to="/products">Products</Link> |{" "}
       <Link to="/cart">Cart</Link> |{" "}
       <Link to="/orders">My Orders</Link> |{" "}

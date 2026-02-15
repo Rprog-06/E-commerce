@@ -41,8 +41,13 @@ function Products() {
         productId: product.id,
         name: product.name,
         price: product.price,
-        quantity: 1,
+         
+        availableStock: product.quantity,
       });
+    }
+    if(product.quantity===0){
+      alert("Product is out of stock!");
+      return;
     }
 
     localStorage.setItem("cart", JSON.stringify(cart));
@@ -65,9 +70,11 @@ function Products() {
         >
           <h4>{product.name}</h4>
           <p>₹ {product.price}</p>
-          <p>Quantity {product.quantity || 1} </p>
+          <p>Quantity :{product.quantity || "NA"} </p>
 
-          <button onClick={() => addToCart(product)}>
+
+          <button onClick={() => addToCart(product)} disabled={product.quantity === 0}
+            style={{ backgroundColor: product.quantity === 0 ? "gray" : "blue", color: "white" }}>
             Add to Cart
           </button>
           <button onClick={()=> window.location.href="/cart"} style={{ marginLeft: "10px" }}>

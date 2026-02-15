@@ -35,5 +35,15 @@ public class ProductService {
        
         
     }
+    public void increaseStock(Long id, int quantity) {
+        if(quantity <= 0) {
+            throw new IllegalArgumentException("Quantity must be positive");
+        }
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+        product.setQuantity(product.getQuantity() + quantity); // Increase stock by given quantity
+         productRepository.save(product);
+
+    }
 }
 

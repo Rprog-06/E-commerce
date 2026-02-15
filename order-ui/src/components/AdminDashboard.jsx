@@ -6,44 +6,78 @@ function AdminDashboard() {
   const [name,setName]=useState("");
   const [price,setPrice]=useState("");
   const [quantity,setQuantity]=useState("");
+  const [stock,setStock]=useState("");
+  
+   const token = localStorage.getItem("token");
+
+  // 🔥 Reusable fetch function
+  const fetchProducts = async () => {
+    try {
+      const res = await axios.get("http://localhost:8080/products", {
+        headers: {
+          Authorization: "Bearer " + token,
+        },
+      });
+      setProducts(res.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   useEffect(() => {
-    axios.get("http://localhost:8080/products", {
-      headers: {
-        Authorization: "Bearer " + localStorage.getItem("token"),
-      },
-    })
-    .then(res => setProducts(res.data))
-    .catch(err => console.error(err));
+    fetchProducts();
   }, []);
-
-  const deleteProduct = (id) => {
-    axios.delete(`http://localhost:8080/products/${id}`, {
+  
+  const deleteProduct = async (id) => {
+  try{
+    await axios.delete(`http://localhost:8080/products/${id}/stock?amount=${stock}`, {
       headers: {
         Authorization: "Bearer " + localStorage.getItem("token"),
       },
     })
-    .then(() => {
-      setProducts(products.filter(p => p.id !== id));
-    });
+    setStock("");
+    setProducts(products.filter(p => p.id !== id));
+  }
+    catch(err){
+      console.error(err); 
+    }
   }
     
     const addProduct= async()=>{
-      axios.post("http://localhost:8080/products",{
+      try{
+    await axios.post("http://localhost:8080/products",{
         name,price,quantity
       },{
         headers:{
           Authorization:"Bearer "+localStorage.getItem("token"),
         }
       })
-      .then(res=>{
+      
         setProducts([...products,res.data]);
         setName("");
         setPrice("");
         setQuantity("");
         alert("Product added");
-      })
-      .catch(err=>console.error(err));
+      
+    }
+      catch(err){
+        console.error(err);
+      }
+     }
+     const increaseStock = async (id) => {
+      try{
+    await axios.put(`http://localhost:8080/products/${id}/stock`, {
+      quantity: parseInt(stock)
+    }, {
+         headers: {
+           Authorization: "Bearer " + localStorage.getItem("token"),
+         },
+       })
+      
+      fetchProducts();
+      } catch(err){
+        console.error(err);
+      }
      }
   
 
@@ -64,6 +98,10 @@ function AdminDashboard() {
           <p>Quantity: {p.quantity}</p>
           <button onClick={() => deleteProduct(p.id)}>
             Delete
+          </button>
+          <input type="number" value={stock} onChange={(e) => setStock(e.target.value)}  style={{ width: "60px", marginLeft: "10px" }} />
+          <button onClick={() => increaseStock(p.id)} style={{ marginLeft: "10px" }}>
+            Increase Stock
           </button>
         </div>
       ))}

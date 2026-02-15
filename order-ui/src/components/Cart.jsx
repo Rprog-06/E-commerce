@@ -20,6 +20,7 @@ function Cart() {
 
       // Prevent below 1
       if (newQuantity < 1) return item;
+      
 
       // Prevent exceeding available stock
       if (newQuantity > item.availableStock) {
@@ -58,7 +59,7 @@ function Cart() {
       productId: item.productId,
       quantity: item.quantity
     
-
+    
       
 
 
@@ -136,6 +137,8 @@ function Cart() {
           <h4>{item.name}</h4>
           <p>Price: ₹ {item.price}</p>
           <p>Quantity: {item.quantity}</p>
+          <p>Total: ₹ {item.price * item.quantity}</p>
+          <p>Available Quantity: {item.availableStock || "N/A"}</p>
      
 
           <button onClick={() => updateQuantity(item.productId, -1)}>

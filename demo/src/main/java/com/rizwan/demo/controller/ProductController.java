@@ -36,6 +36,12 @@ public ResponseEntity<?> deleteProduct(@PathVariable Long id) {
     productService.delete(id);
     return ResponseEntity.ok("Deleted");
 }
+@PreAuthorize("hasRole('ADMIN')")
+@PutMapping("/{id}/stock")
+public ResponseEntity<?> increaseStock(@PathVariable  Long id, @RequestBody ProductRequest request) {
+    productService.increaseStock(id, request.getQuantity());
+    return ResponseEntity.ok("Stock increased");
+}
 
 }
 

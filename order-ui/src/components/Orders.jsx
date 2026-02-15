@@ -36,7 +36,7 @@ function Orders() {
           <p><b>Order ID:</b> {order.orderId}</p>
           <p><b>Status:</b> {order.status}</p>
           <p><b>Date:</b> {order.orderDate}</p>
-
+         
           <ul>
             {order.items.map((item) => (
               <li key={item.productId}>
