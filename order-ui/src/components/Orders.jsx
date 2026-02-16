@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import {jwtDecode} from "jwt-decode";
-import API from "../../api";
+import API from "../api/api";
 
 function Orders() {
   const [orders, setOrders] = useState([]);
