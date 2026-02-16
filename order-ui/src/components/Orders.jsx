@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import {jwtDecode} from "jwt-decode";
+import API from "../../api";
 
 function Orders() {
   const [orders, setOrders] = useState([]);
@@ -15,8 +16,8 @@ function Orders() {
   
   useEffect(() => {
      const token= (localStorage.getItem("token"));
-    axios
-      .get(`http://localhost:8080/orders/my`,{
+    API
+      .get(`/orders/my`,{
         headers: {
           Authorization: `Bearer ${token}`,
         },

@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import Cart from "./Cart";
 import axios from "axios";
-
+import { jwtDecode } from "jwt-decode";
+import API from "../../api";
 function Products() {
   const [products, setProducts] = useState([]);
 
@@ -13,8 +14,8 @@ function Products() {
       window.location.href = "/login";
       return;
     }
-    axios
-      .get("http://localhost:8080/products",
+    API
+      .get("/products",
         {
           headers: {  
             "Authorization": `Bearer ${token}`

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+import API from "../../api"
 
 function RegisterUser() {
   const [formData, setFormData] = useState({
@@ -26,8 +27,8 @@ function RegisterUser() {
     setError("");
 
     try {
-      const response = await axios.post(
-        "http://localhost:8080/users",
+      const response = await API.post(
+        "/users",
         formData
       );
 

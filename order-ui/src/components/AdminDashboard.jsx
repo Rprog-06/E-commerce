@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import API from "../../api";
+
 
 function AdminDashboard() {
   const [products, setProducts] = useState([]);
@@ -13,7 +15,7 @@ function AdminDashboard() {
   // 🔥 Reusable fetch function
   const fetchProducts = async () => {
     try {
-      const res = await axios.get("http://localhost:8080/products", {
+      const res = await API.get("http://localhost:8080/products", {
         headers: {
           Authorization: "Bearer " + token,
         },
@@ -30,7 +32,7 @@ function AdminDashboard() {
   
   const deleteProduct = async (id) => {
   try{
-    await axios.delete(`http://localhost:8080/products/${id}/stock?amount=${stock}`, {
+    await API.delete(`http://localhost:8080/products/${id}/stock?amount=${stock}`, {
       headers: {
         Authorization: "Bearer " + localStorage.getItem("token"),
       },
@@ -45,7 +47,7 @@ function AdminDashboard() {
     
     const addProduct= async()=>{
       try{
-    await axios.post("http://localhost:8080/products",{
+    await API.post("/products",{
         name,price,quantity
       },{
         headers:{
