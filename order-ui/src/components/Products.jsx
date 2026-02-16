@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Cart from "./Cart";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
-import API from "../../api";
+import api from "../api/api";
 function Products() {
   const [products, setProducts] = useState([]);
 
@@ -14,7 +14,7 @@ function Products() {
       window.location.href = "/login";
       return;
     }
-    API
+    api
       .get("/products",
         {
           headers: {  

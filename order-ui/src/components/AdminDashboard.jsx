@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import API from "../../api";
+import api from "../api/api";
 
 
 function AdminDashboard() {
@@ -15,7 +15,7 @@ function AdminDashboard() {
   // 🔥 Reusable fetch function
   const fetchProducts = async () => {
     try {
-      const res = await API.get("http://localhost:8080/products", {
+      const res = await api.get("http://localhost:8080/products", {
         headers: {
           Authorization: "Bearer " + token,
         },
