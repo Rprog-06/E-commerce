@@ -62,21 +62,16 @@ package com.rizwan.demo.service;
 // }
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import com.rizwan.demo.enums.Role;
-import com.rizwan.demo.security.JwtUtil;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.rizwan.demo.dto.LoginResponse;
 import com.rizwan.demo.dto.UserRegisterRequest;
-
 import com.rizwan.demo.entity.Users;
 import com.rizwan.demo.exception.ResourceNotFoundException;
 import com.rizwan.demo.repository.UserRepository;
-import com.rizwan.demo.dto.UserRegisterRequest;
-
-import org.springframework.transaction.annotation.Transactional;
+import com.rizwan.demo.security.JwtUtil;
 
 @Service
 public class UserService {
@@ -103,6 +98,7 @@ public class UserService {
         user.setName(request.getName());
         user.setPassword(request.getPassword()); // In real applications, hash the password!
         user.setEmail(request.getEmail());
+        user.setRole(request.getRole());
 
         return userRepository.save(user);
     }

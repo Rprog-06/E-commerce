@@ -1,6 +1,8 @@
 package com.rizwan.demo.dto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank; 
+import jakarta.validation.constraints.NotNull;
+import com.rizwan.demo.enums.Role;
 
 
 public class UserRegisterRequest {
@@ -11,6 +13,8 @@ public class UserRegisterRequest {
     @Email(message = "Email should be valid")
     @NotBlank(message = "Email is mandatory")
     private String email;
+   @NotNull(message = "Role is mandatory")
+    private Role role;
 
     // getters and setters
     public String getName() {
@@ -31,7 +35,11 @@ public class UserRegisterRequest {
     public void setEmail(String email) {
         this.email = email;
     }
-
-
+    public Role getRole() {
+        return role;
+    }
+    public void setRole(Role role) {
+        this.role = role;
+    }
 
 }

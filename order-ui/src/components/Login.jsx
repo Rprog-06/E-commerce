@@ -3,7 +3,9 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import api from "../api/api";
 
+
 function Login() {
+ 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -31,6 +33,7 @@ function Login() {
       localStorage.setItem("token", response.data.token) ;
       localStorage.setItem("userId", response.data.id);
       localStorage.setItem("role", response.data.role);
+      console.log("Login successful:", response.data);
 
       navigate("/products");
     } catch (err) {
