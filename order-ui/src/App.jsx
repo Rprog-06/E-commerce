@@ -4,7 +4,7 @@ import Orders from "./components/Orders";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Products from "./components/Products";
 import Cart from "./components/Cart";
-import Navbar from "./components/Navbar"
+import Layout from "./components/Layout"
 import RegisterUser from "./components/RegisterUser";
 import AdminDashboard from "./components/AdminDashboard";
 
@@ -16,7 +16,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<RegisterUser />} />
     
-     <Route element= {<Navbar />}/>
+     <Route element= {<Layout />}>
       
        
 
@@ -44,7 +44,8 @@ function App() {
           <ProtectedRoute>
           <Cart />
           </ProtectedRoute>} />
-          
+          </Route>
+
       </Routes>
    
     </BrowserRouter>
