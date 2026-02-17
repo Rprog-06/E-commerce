@@ -68,16 +68,13 @@ function Cart() {
   console.log("Sending",orderPayload)
 
   try {
-    const response = await fetch("http://localhost:8080/orders", {
-      method: "POST",
+    const response = await api.post("/orders", orderPayload, {
       headers: {
-        "Content-Type": "application/json",
         "Authorization": `Bearer ${token}`
-        
-      },
-   
-      body: JSON.stringify(orderPayload)
-    });
+      }
+    })
+     
+    
 
     if (!response.ok) {
       const error=await response.text();
