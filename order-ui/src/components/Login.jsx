@@ -20,13 +20,13 @@ function Login() {
       const response = await api.post(
         "/users/login",
         { email, password },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${localStorage.getItem("token")}`
-          },
-          body: JSON.stringify({ email, password })
-        }
+        // {
+        //   headers: {
+        //     "Content-Type": "application/json",
+        //     "Authorization": `Bearer ${localStorage.getItem("token")}`
+        //   },
+        //   body: JSON.stringify({ email, password })
+        // }
       );
 
       // save login info
