@@ -78,7 +78,7 @@ function Products() {
             style={{ backgroundColor: product.quantity === 0 ? "gray" : "blue", color: "white" }}>
             Add to Cart
           </button>
-          <button onClick={()=> window.location.href="/cart"} style={{ marginLeft: "10px" }}>
+          <button onClick={()=> window.location.href="/Cart"} style={{ marginLeft: "10px" }}>
             View Cart
           </button>
        
