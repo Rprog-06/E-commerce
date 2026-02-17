@@ -1,12 +1,13 @@
 import { useState } from "react";
 import axios from "axios";
-import API from "../../api"
+import api from "../api/api"
 
 function RegisterUser() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    password: ""
+    password: "",
+    role: "USER"
   });
 
   const [message, setMessage] = useState("");
@@ -27,7 +28,7 @@ function RegisterUser() {
     setError("");
 
     try {
-      const response = await API.post(
+      const response = await api.post(
         "/users",
         formData
       );

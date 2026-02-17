@@ -5,16 +5,20 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Products from "./components/Products";
 import Cart from "./components/Cart";
 import Navbar from "./components/Navbar"
+import RegisterUser from "./components/RegisterUser";
 import AdminDashboard from "./components/AdminDashboard";
 
 function App() {
   return (
     <BrowserRouter>
-     <Navbar />
-      <Routes>
-        <Route path="/" element={ <Navigate to="/login" />} />
+   <Routes>
+     <Route path="/" element={ <Navigate to="/login" />} />
         <Route path="/login" element={<Login />} />
-
+        <Route path="/register" element={<RegisterUser />} />
+    
+     <Route element= {<Navbar />}/>
+      
+       
 
         <Route
           path="/orders"
@@ -40,8 +44,9 @@ function App() {
           <ProtectedRoute>
           <Cart />
           </ProtectedRoute>} />
+          
       </Routes>
-
+   
     </BrowserRouter>
   );
 }

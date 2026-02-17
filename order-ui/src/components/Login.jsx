@@ -73,7 +73,7 @@ function Login() {
         <button type="submit">Login</button>
 
       </form>
-      <p>Don't have an account? <button {()=>navigate("/RegisterUser")}>Register</button></p>
+      <p>Don't have an account? <button onClick= {()=>navigate("/register")}>Register</button></p>
     </div>
   );
 }
