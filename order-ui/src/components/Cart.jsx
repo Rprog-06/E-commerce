@@ -112,7 +112,7 @@ function Cart() {
 
   // total price
   const totalPrice = cart.reduce(
-    (sum, item) => sum + item.price * item.quantity,
+    (sum, item) => sum + (Number(item.price)||0) * (Number(item.quantity)||0),
     0
   );
 
