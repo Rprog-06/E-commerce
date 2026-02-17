@@ -47,7 +47,7 @@ function AdminDashboard() {
     
     const addProduct= async()=>{
       try{
-    await api.post("/products",{
+   const res= await api.post("/products",{
         name,price,quantity
       },{
         headers:{
