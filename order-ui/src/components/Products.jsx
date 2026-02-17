@@ -3,9 +3,10 @@ import Cart from "./Cart";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import api from "../api/api";
+import {useNavigate} from "react-router-dom";
 function Products() {
   const [products, setProducts] = useState([]);
-
+  const navigate=useNavigate();
   // load products
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -78,7 +79,7 @@ function Products() {
             style={{ backgroundColor: product.quantity === 0 ? "gray" : "blue", color: "white" }}>
             Add to Cart
           </button>
-          <button onClick={()=> window.location.href="/Cart"} style={{ marginLeft: "10px" }}>
+          <button onClick={()=> navigate("/Cart")} style={{ marginLeft: "10px" }}>
             View Cart
           </button>
        
