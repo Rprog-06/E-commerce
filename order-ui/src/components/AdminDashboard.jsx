@@ -15,7 +15,7 @@ function AdminDashboard() {
   // 🔥 Reusable fetch function
   const fetchProducts = async () => {
     try {
-      const res = await api.get("http://localhost:8080/products", {
+      const res = await api.get("/products", {
         headers: {
           Authorization: "Bearer " + token,
         },
@@ -32,7 +32,7 @@ function AdminDashboard() {
   
   const deleteProduct = async (id) => {
   try{
-    await API.delete(`http://localhost:8080/products/${id}/stock?amount=${stock}`, {
+    await api.delete(`/products/${id}/stock?amount=${stock}`, {
       headers: {
         Authorization: "Bearer " + localStorage.getItem("token"),
       },
@@ -47,7 +47,7 @@ function AdminDashboard() {
     
     const addProduct= async()=>{
       try{
-    await API.post("/products",{
+    await api.post("/products",{
         name,price,quantity
       },{
         headers:{
@@ -68,7 +68,7 @@ function AdminDashboard() {
      }
      const increaseStock = async (id) => {
       try{
-    await axios.put(`http://localhost:8080/products/${id}/stock`, {
+    await api.put(`/products/${id}/stock`, {
       quantity: parseInt(stock)
     }, {
          headers: {
