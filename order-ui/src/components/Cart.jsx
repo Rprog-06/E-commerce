@@ -78,16 +78,7 @@ function Cart() {
      
     
 
-    if (!response.ok) {
-      const error=await response.text();
-      console.error("Order failed:", error);
-      throw new Error("Order failed");
-
-    }
-
-    const message = await response.text();
-    alert(message);
-    
+   alert(response.data.message)
 
     // clear cart
     localStorage.removeItem("cart");
