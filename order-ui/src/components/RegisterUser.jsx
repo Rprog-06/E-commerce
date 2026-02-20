@@ -1,6 +1,8 @@
 import { useState } from "react";
 import axios from "axios";
 import api from "../api/api"
+import { useNavigate } from "react-router-dom";
+
 
 function RegisterUser() {
   const [formData, setFormData] = useState({
@@ -10,8 +12,10 @@ function RegisterUser() {
     role: "USER"
   });
 
+
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const navigate = useNavigate()
 
   // handle input change
   const handleChange = (e) => {
@@ -37,6 +41,7 @@ function RegisterUser() {
       setFormData({ name: "", email: "", password: "" });
 
       console.log(response.data);
+      navigate("/login");
     } catch (err) {
       console.error(err);
       setError(err.response?.data?.message || "Registration failed ❌");

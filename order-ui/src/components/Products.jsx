@@ -7,9 +7,26 @@ import {useNavigate} from "react-router-dom";
 function Products() {
   const [products, setProducts] = useState([]);
   const navigate=useNavigate();
+  const getUserIdFromToken = () => {
+  const token = localStorage.getItem("token");
+  if (!token) return null;
+
+  try {
+    const decoded=jwtDecode(token);
+    console.log(decoded);  
+    return decoded.id||decoded.sub;   // or payload.sub (check your JWT)
+  } catch (error) {
+    console.error("Invalid token", error);
+    return null;
+  }
+};
   // load products
   useEffect(() => {
     const token = localStorage.getItem("token");
+    
+   // console.log("Decoded JWT Payload:", payload);
+
+
     if (!token) {
       alert("Please login first");
       window.location.href = "/login";
@@ -26,11 +43,21 @@ function Products() {
       .then((res) => setProducts(res.data))
       .catch((err) => console.error(err));
   }, []);
+  
 
   
   // add to cart
   const addToCart = (product) => {
-    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+    // token = localStorage.getItem("token");
+     const userId = getUserIdFromToken();
+     if (!userId) {
+      alert("Please login first");
+      return;
+    }
+    let cart = JSON.parse(localStorage.getItem(`cart_${userId}`)) || [];
+   
+    
+
 
     const existingItem = cart.find(
       (item) => item.productId === product.id
@@ -43,6 +70,7 @@ function Products() {
         productId: product.id,
         name: product.name,
         price: product.price,
+        quantity: 1,
          
         availableStock: product.quantity,
       });
@@ -52,7 +80,7 @@ function Products() {
       return;
     }
 
-    localStorage.setItem("cart", JSON.stringify(cart));
+    localStorage.setItem(`cart_${userId}`, JSON.stringify(cart));
     alert("Added to cart");
 
   };

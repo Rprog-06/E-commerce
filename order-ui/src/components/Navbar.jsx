@@ -10,7 +10,9 @@ const Navbar = () => {
   }
 
   const logout = () => {
-    localStorage.clear();
+    localStorage.removeItem("token");
+    localStorage.removeItem("userId");
+    localStorage.removeItem("role");
     navigate("/login");
   };
 

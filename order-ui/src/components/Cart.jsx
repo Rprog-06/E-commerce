@@ -1,111 +1,127 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
+import { useEffect, useState, useRef } from "react";
+import { jwtDecode } from "jwt-decode";
 import api from "../api/api";
 
 function Cart() {
   const [cart, setCart] = useState([]);
-  const [products, setProducts] = useState([]);
- 
+  const [userId, setUserId] = useState(null);
+  const hasInitialized = useRef(false);
 
-  // load cart
+  // 🔐 Decode token and set userId
   useEffect(() => {
-    const storedCart = JSON.parse(localStorage.getItem("cart")) || [];
-    setCart(storedCart);
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      window.location.href = "/login";
+      return;
+    }
+
+    try {
+      const decoded = jwtDecode(token);
+      const id = decoded.id || decoded.sub;
+
+      if (!id) {
+        window.location.href = "/login";
+        return;
+      }
+
+      setUserId(id);
+
+    } catch (error) {
+      console.error("Invalid token", error);
+      window.location.href = "/login";
+    }
   }, []);
 
-  // update quantity
+  // 📦 Load cart when userId is ready
+  useEffect(() => {
+    if (!userId) return;
+
+    const storedCart =
+      JSON.parse(localStorage.getItem(`cart_${userId}`)) || [];
+
+    setCart(storedCart);
+    hasInitialized.current = true;
+
+  }, [userId]);
+
+  // 💾 Save cart ONLY after initialization
+  useEffect(() => {
+    if (!userId) return;
+    if (!hasInitialized.current) return;
+
+    localStorage.setItem(`cart_${userId}`, JSON.stringify(cart));
+
+  }, [cart, userId]);
+
+  // ➕➖ Update quantity
   const updateQuantity = (productId, delta) => {
-  const updatedCart = cart.map((item) => {
-    if (item.productId === productId) {
+    const updatedCart = cart.map((item) => {
+      if (item.productId === productId) {
+        const newQuantity = item.quantity + delta;
 
-      const newQuantity = item.quantity + delta;
+        if (newQuantity < 1) return item;
 
-      // Prevent below 1
-      if (newQuantity < 1) return item;
-      
+        if (newQuantity > item.availableStock) {
+          alert("Cannot exceed available stock!");
+          return item;
+        }
 
-      // Prevent exceeding available stock
-      if (newQuantity > item.availableStock) {
-        alert("Cannot exceed available stock!");
-        return item;
+        return { ...item, quantity: newQuantity };
       }
+      return item;
+    });
 
-      return {
-        ...item,
-        quantity: newQuantity
-      };
-    }
-    return item;
-  });
-
-  setCart(updatedCart);
-  localStorage.setItem("cart", JSON.stringify(updatedCart));
-};
-
-   
-  const placeOrder = async () => {
-  const token = (localStorage.getItem("token"));
-
-  if (!token) {
-    alert("Please login first");
-    return;
-  }
-  if(cart.length==0){
-    alert("Cart is empty");
-    return;
-  }
-
-  const orderPayload = {
-    
-    items: cart.map(item => ({
-      productId: item.productId,
-      quantity: item.quantity
-    
-    
-      
-
-
-    }))
+    setCart(updatedCart);
   };
-  console.log("Sending",orderPayload)
 
-  try {
-    const response = await api.post("/orders", orderPayload, {
-      headers: {
-        "Authorization": `Bearer ${token}`
-      }
-    })
-     
-    
-
-   alert(response.data.message)
-
-    // clear cart
-    localStorage.removeItem("cart");
-    setCart([]);
-
-    // redirect
-    window.location.href = "/orders";
-
-  } catch (error) {
-    alert("Error placing order");
-    console.error(error);
-  }
-};
-
-  // remove item
+  // ❌ Remove item
   const removeItem = (productId) => {
     const updatedCart = cart.filter(
       (item) => item.productId !== productId
     );
-
     setCart(updatedCart);
-    localStorage.setItem("cart", JSON.stringify(updatedCart));
   };
 
-  // total price
+  // 🛒 Place Order
+  const placeOrder = async () => {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      window.location.href = "/login";
+      return;
+    }
+
+    if (cart.length === 0) {
+      alert("Cart is empty");
+      return;
+    }
+
+    const orderPayload = {
+      items: cart.map(item => ({
+        productId: item.productId,
+        quantity: item.quantity
+      }))
+    };
+
+    try {
+      const response = await api.post("/orders", orderPayload, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      alert(response.data.message || "Order placed successfully");
+
+      setCart([]);
+
+    } catch (error) {
+      alert("Error placing order");
+      console.error(error);
+    }
+  };
+
   const totalPrice = cart.reduce(
-    (sum, item) => sum + (Number(item.price)||0) * (Number(item.quantity)||0),
+    (sum, item) =>
+      sum + (Number(item.price) || 0) * (Number(item.quantity) || 0),
     0
   );
 
@@ -128,8 +144,7 @@ function Cart() {
           <p>Price: ₹ {item.price}</p>
           <p>Quantity: {item.quantity}</p>
           <p>Total: ₹ {item.price * item.quantity}</p>
-          <p>Available Quantity: {item.availableStock || "N/A"}</p>
-     
+          <p>Available: {item.availableStock}</p>
 
           <button onClick={() => updateQuantity(item.productId, -1)}>
             -
@@ -150,7 +165,7 @@ function Cart() {
       {cart.length > 0 && (
         <>
           <h3>Total: ₹ {totalPrice}</h3>
-          <button style={{ marginTop: "10px" }} onClick={placeOrder} >
+          <button onClick={placeOrder}>
             Place Order
           </button>
         </>
