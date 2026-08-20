@@ -8,17 +8,28 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
+    const normalizedEmail = email.trim();
+    if (!normalizedEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
+      setError("Enter a valid email address.");
+      return;
+    }
+    if (!password) {
+      setError("Enter your password.");
+      return;
+    }
+    setIsSubmitting(true);
 
     try {
       const response = await api.post(
         "/users/login",
-        { email, password },
+        { email: normalizedEmail, password },
         // {
         //   headers: {
         //     "Content-Type": "application/json",
@@ -36,8 +47,10 @@ function Login() {
 
       navigate("/products");
     } catch (err) {
-      setError("Invalid email or password ❌");
-      console.error("Login error:", err.response.data);
+      setError(err.response?.data?.message || "Invalid email or password.");
+      console.error("Login error:", err);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -70,7 +83,7 @@ function Login() {
           />
         </div>
 
-          <button className="btn btn-primary auth-submit" type="submit">Sign in <span aria-hidden="true">→</span></button>
+          <button className="btn btn-primary auth-submit" type="submit" disabled={isSubmitting}>{isSubmitting ? "Signing in..." : <>Sign in <span aria-hidden="true">→</span></>}</button>
         </form>
         <p className="auth-switch">New to orbit? <button onClick={() => navigate("/register")}>Create an account</button></p>
       </div>

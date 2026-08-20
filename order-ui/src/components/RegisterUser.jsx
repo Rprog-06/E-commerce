@@ -14,6 +14,7 @@ function RegisterUser() {
 
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate()
 
   // handle input change
@@ -29,11 +30,26 @@ function RegisterUser() {
     e.preventDefault();
     setMessage("");
     setError("");
+    const name = formData.name.trim();
+    const email = formData.email.trim();
+    if (name.length < 2) {
+      setError("Name must contain at least 2 characters.");
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setError("Enter a valid email address.");
+      return;
+    }
+    if (formData.password.length < 8) {
+      setError("Password must contain at least 8 characters.");
+      return;
+    }
+    setIsSubmitting(true);
 
     try {
       const response = await api.post(
         "/users",
-        formData
+        { ...formData, name, email }
       );
 
       setMessage("User registered successfully ✅");
@@ -44,6 +60,8 @@ function RegisterUser() {
     } catch (err) {
       console.error(err);
       setError(err.response?.data?.message || "Registration failed ❌");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -91,7 +109,7 @@ function RegisterUser() {
           />
         </div>
 
-          <button className="btn btn-primary auth-submit" type="submit">Create account <span aria-hidden="true">→</span></button>
+          <button className="btn btn-primary auth-submit" type="submit" disabled={isSubmitting}>{isSubmitting ? "Creating account..." : <>Create account <span aria-hidden="true">→</span></>}</button>
         </form>
         <p className="auth-switch">Already have an account? <button onClick={() => navigate("/login")}>Sign in</button></p>
       </div>

@@ -43,7 +43,7 @@ public class UserController {
     }
      @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(
-            @RequestBody LoginRequest request
+            @Valid @RequestBody LoginRequest request
     ) {
         LoginResponse response = userService.login(
                 request.getEmail(),

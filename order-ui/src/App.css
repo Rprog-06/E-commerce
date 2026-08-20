@@ -12,6 +12,7 @@
 .btn-quiet { color: var(--ink); background: #edf0e9; }
 .btn-danger { color: #a53f2c; background: #fff0ec; }
 .empty-state { padding: 62px 24px; text-align: center; border: 1px dashed #cdd6cd; border-radius: 8px; background: var(--paper); }
+.cart-feedback { max-width: 760px; }
 .empty-state h3 { margin: 0 0 8px; font-family: Georgia, serif; font-size: 1.6rem; }
 .form-field { display: grid; gap: 8px; margin-bottom: 18px; }
 .form-field label { color: var(--muted); font-size: 0.8rem; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; }

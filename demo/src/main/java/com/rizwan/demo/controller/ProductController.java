@@ -9,6 +9,7 @@ import com.rizwan.demo.service.ProductService;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/products")
@@ -21,7 +22,7 @@ public class ProductController {
     }
     @PreAuthorize("hasRole('ADMIN')")  
     @PostMapping
-    public ResponseEntity<Product> createProduct(@RequestBody ProductRequest request) {
+    public ResponseEntity<Product> createProduct(@Valid @RequestBody ProductRequest request) {
         Product product = productService.createProduct(request);
         return ResponseEntity.ok(product);
     }

@@ -8,6 +8,7 @@ function AdminDashboard() {
   const [price,setPrice]=useState("");
   const [quantity,setQuantity]=useState("");
   const [stock,setStock]=useState({});
+  const [formError,setFormError]=useState("");
   
    const token = localStorage.getItem("token");
 
@@ -31,13 +32,18 @@ function AdminDashboard() {
   
   const deleteProduct = async (id) => {
   try{
-    await api.delete(`/products/${id}/stock?amount=${stock}`, {
+    const amount = Number(stock[id]);
+    if (!Number.isInteger(amount) || amount < 1) {
+      alert("Enter the number of units to remove");
+      return;
+    }
+    await api.delete(`/products/${id}/stock?amount=${amount}`, {
       headers: {
         Authorization: "Bearer " + localStorage.getItem("token"),
       },
     })
     setStock({});
-    setProducts(products.filter(p => p.id !== id));
+    setProducts(products.map((product) => product.id === id ? { ...product, quantity: product.quantity - amount } : product).filter((product) => product.quantity > 0));
   }
     catch(err){
       console.error(err); 
@@ -45,9 +51,25 @@ function AdminDashboard() {
   }
     
     const addProduct= async()=>{
+      const normalizedName = name.trim();
+      const numericPrice = Number(price);
+      const numericQuantity = Number(quantity);
+      if (normalizedName.length < 2) {
+        setFormError("Product name must contain at least 2 characters.");
+        return;
+      }
+      if (!Number.isFinite(numericPrice) || numericPrice <= 0) {
+        setFormError("Price must be greater than 0.");
+        return;
+      }
+      if (!Number.isInteger(numericQuantity) || numericQuantity < 0) {
+        setFormError("Opening stock must be a whole number of 0 or more.");
+        return;
+      }
+      setFormError("");
       try{
    const res= await api.post("/products",{
-        name,price,quantity
+        name: normalizedName, price: numericPrice, quantity: numericQuantity
       },{
         headers:{
           Authorization:"Bearer "+localStorage.getItem("token"),
@@ -63,6 +85,7 @@ function AdminDashboard() {
     }
       catch(err){
         console.error(err);
+        setFormError(err.response?.data?.message || "Could not add product.");
       }
      }
      const increaseStock = async (id) => {
@@ -92,7 +115,7 @@ function AdminDashboard() {
     <div className="site-main admin-page">
       <div className="page-heading"><div><p className="eyebrow">Workspace / Admin</p><h1>Good morning.</h1><p className="subtle">Keep your collection fresh and ready to ship.</p></div><span className="admin-live"><i /> Store is live</span></div>
       <section className="admin-stats"><div><span className="stat-label">Products</span><strong>{products.length}</strong><span className="stat-note">in your catalogue</span></div><div><span className="stat-label">Units in stock</span><strong>{totalStock}</strong><span className="stat-note">ready to sell</span></div><div><span className="stat-label">Low stock</span><strong>{products.filter((product) => product.quantity > 0 && product.quantity < 5).length}</strong><span className="stat-note">need attention</span></div></section>
-      <section className="admin-add-panel"><div><p className="eyebrow">Catalogue</p><h2>Add a new product</h2><p className="subtle">Make something new available to your customers.</p></div><form className="admin-product-form" onSubmit={(event) => { event.preventDefault(); addProduct(); }}><label><span>Name</span><input placeholder="e.g. Linen throw" value={name} onChange={(event) => setName(event.target.value)} required /></label><label><span>Price</span><input type="number" min="0" placeholder="₹ 0" value={price} onChange={(event) => setPrice(event.target.value)} required /></label><label><span>Opening stock</span><input type="number" min="0" placeholder="0" value={quantity} onChange={(event) => setQuantity(event.target.value)} required /></label><button className="btn btn-primary" type="submit">Add product <span aria-hidden="true">→</span></button></form></section>
+      <section className="admin-add-panel"><div><p className="eyebrow">Catalogue</p><h2>Add a new product</h2><p className="subtle">Make something new available to your customers.</p>{formError && <p className="form-error">{formError}</p>}</div><form className="admin-product-form" onSubmit={(event) => { event.preventDefault(); addProduct(); }}><label><span>Name</span><input placeholder="e.g. Linen throw" value={name} onChange={(event) => setName(event.target.value)} required /></label><label><span>Price</span><input type="number" min="0.01" step="0.01" placeholder="₹ 0" value={price} onChange={(event) => setPrice(event.target.value)} required /></label><label><span>Opening stock</span><input type="number" min="0" step="1" placeholder="0" value={quantity} onChange={(event) => setQuantity(event.target.value)} required /></label><button className="btn btn-primary" type="submit">Add product <span aria-hidden="true">→</span></button></form></section>
       <section className="admin-inventory"><div className="inventory-heading"><div><p className="eyebrow">Inventory</p><h2>All products</h2></div><span className="subtle">{products.length} listings</span></div>{products.length === 0 ? <div className="empty-state"><h3>Your catalogue is empty</h3><p className="subtle">Add your first product above.</p></div> : <div className="inventory-list">{products.map((product) => <article className="inventory-row" key={product.id}><div className="inventory-swatch" aria-hidden="true">✦</div><div className="inventory-name"><h3>{product.name}</h3><span>SKU-{String(product.id).padStart(4, "0")}</span></div><div className="inventory-price">₹ {product.price}</div><div className={`inventory-stock ${product.quantity < 5 ? "is-low" : ""}`}><strong>{product.quantity}</strong><span>{product.quantity < 5 ? "Low stock" : "In stock"}</span></div><div className="inventory-actions"><label className="stock-input"><span>Add units</span><input type="number" min="1" placeholder="0" value={stock[product.id] || ""} onChange={(event) => setStock({ ...stock, [product.id]: event.target.value })} /></label><button className="btn btn-quiet" onClick={() => increaseStock(product.id)}>Restock</button><button className="btn btn-danger" onClick={() => deleteProduct(product.id)}>Remove</button></div></article>)}</div>}</section>
     </div>
   );
